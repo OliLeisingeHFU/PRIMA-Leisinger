@@ -24,7 +24,7 @@ var L01_FirstFudge;
     }
     function update(_event) {
         // console.log(_event);
-        let rotSpeed = 90;
+        let rotSpeed = 45;
         let timeSinceLastFrameInSeconds = ƒ.Loop.timeFrameReal / 1000;
         node.getComponent(ƒ.ComponentMesh).mtxPivot.rotateZ(rotSpeed * timeSinceLastFrameInSeconds);
         viewport.draw();

@@ -30,7 +30,7 @@ namespace L01_FirstFudge {
 
   function update(_event: Event): void {
     // console.log(_event);
-    let rotSpeed: number = 90;
+    let rotSpeed: number = 45;
     let timeSinceLastFrameInSeconds: number = ƒ.Loop.timeFrameReal / 1000;
     node.getComponent(ƒ.ComponentMesh).mtxPivot.rotateZ(rotSpeed * timeSinceLastFrameInSeconds);
     viewport.draw();
