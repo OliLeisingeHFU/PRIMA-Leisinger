@@ -2,31 +2,44 @@ namespace SpaceInvaders {
     import ƒ = FudgeCore;
     
     export class ShipProjectile extends Projectile {
-      static instance: Ship;
+      static instance: ShipProjectile;
 
       private constructor(_pos: ƒ.Vector2) {
         super("PlayerProjectile", _pos);
       }
 
-      static getInstance(_x: number, _y: number): ShipProjectile {
-        let pos: ƒ.Vector2 = new ƒ.Vector2(_x, _y);
-        if (this.instance == null) this.instance = new ShipProjectile(pos);
+      static getInstance(_pos: ƒ.Vector2): ShipProjectile {
+        if (this.instance == null) this.instance = new ShipProjectile(_pos);
         return this.instance;
       }
 
-      static shoot()
+      static move(): void
       {
-        let offset: number = Projectile.speedProjectile * ƒ.Loop.timeFrameReal / 1000;
-        if (this.instance != null)
+        if (ShipProjectile.projectileExists())
         {
+          console.log(this.instance);
+          let offset: number = Projectile.speedProjectile * ƒ.Loop.timeFrameReal / 1000;
           this.instance.mtxLocal.translateY(+offset);
-          console.log(this.instance)
-          if (this.instance.cmpTransform.mtxLocal.translation.y >= 15)
+          this.instance.setRectPosition();
+          if (this.instance.cmpTransform.mtxLocal.translation.y >= 14)
           {
-            this.instance = null;
+            this.despawnProjectile();
           }
         }
-        
+      }
+
+      static projectileExists(): boolean
+      {
+        if(this.instance == null)
+        {
+          return false;
+        }
+        return true;
+      }
+
+      static despawnProjectile(): void
+      {
+          this.instance = null;
       }
     }
   }

@@ -6,21 +6,30 @@ var SpaceInvaders;
         constructor(_pos) {
             super("PlayerProjectile", _pos);
         }
-        static getInstance(_x, _y) {
-            let pos = new ƒ.Vector2(_x, _y);
+        static getInstance(_pos) {
             if (this.instance == null)
-                this.instance = new ShipProjectile(pos);
+                this.instance = new ShipProjectile(_pos);
             return this.instance;
         }
-        static shoot() {
-            let offset = SpaceInvaders.Projectile.speedProjectile * ƒ.Loop.timeFrameReal / 1000;
-            if (this.instance != null) {
-                this.instance.mtxLocal.translateY(+offset);
+        static move() {
+            if (ShipProjectile.projectileExists()) {
                 console.log(this.instance);
-                if (this.instance.cmpTransform.mtxLocal.translation.y >= 15) {
-                    this.instance = null;
+                let offset = SpaceInvaders.Projectile.speedProjectile * ƒ.Loop.timeFrameReal / 1000;
+                this.instance.mtxLocal.translateY(+offset);
+                this.instance.setRectPosition();
+                if (this.instance.cmpTransform.mtxLocal.translation.y >= 14) {
+                    this.despawnProjectile();
                 }
             }
+        }
+        static projectileExists() {
+            if (this.instance == null) {
+                return false;
+            }
+            return true;
+        }
+        static despawnProjectile() {
+            this.instance = null;
         }
     }
     SpaceInvaders.ShipProjectile = ShipProjectile;
