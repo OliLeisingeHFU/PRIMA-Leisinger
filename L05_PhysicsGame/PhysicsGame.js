@@ -8,7 +8,7 @@ var L05_PhysicsGame;
     let cmpCamera;
     let viewport;
     let avatar;
-    let speedPC = 4;
+    let speedPC = 1;
     let rotSpeed = 4;
     window.addEventListener("load", start);
     async function start(_event) {
@@ -44,9 +44,9 @@ var L05_PhysicsGame;
         forward = avatar.mtxWorld.getZ();
         // Movement:
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP]))
-            cmpAvatar.setVelocity(ƒ.Vector3.SCALE(forward, speedPC));
+            cmpAvatar.applyForce(ƒ.Vector3.SCALE(forward, speedPC));
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]))
-            cmpAvatar.setVelocity(ƒ.Vector3.SCALE(forward, -speedPC));
+            cmpAvatar.applyForce(ƒ.Vector3.SCALE(forward, -speedPC));
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
             cmpAvatar.rotateBody(ƒ.Vector3.Y(rotSpeed));
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
