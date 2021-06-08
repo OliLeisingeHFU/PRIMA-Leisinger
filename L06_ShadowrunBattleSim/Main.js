@@ -31,5 +31,10 @@ var Shadowrun;
             arena.mtxLocal.rotateY(+offset);
         viewport.draw();
     }
+    /*
+    code for loading json:
+    let response: Response = await fetch("config.json");
+    let textResponse: Object = await response.json();
+    */
 })(Shadowrun || (Shadowrun = {}));
 //# sourceMappingURL=Main.js.map

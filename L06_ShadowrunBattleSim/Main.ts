@@ -39,4 +39,19 @@ namespace Shadowrun {
 
     viewport.draw();
   }
+
+  /*
+  code for loading json:
+  let response: Response = await fetch("config.json");
+  let textResponse: Object = await response.json();
+  let speed: number = Reflect.get(config, "speed");
+
+  JSON als komplexes objekt i suwupose
+  interface Config{
+    speed: number;
+  }
+  interface ist nur wichtig für den kompiler :) existiert nicht mehr im code nach compiling
+
+  let config: Config;
+  */
 }

@@ -46,11 +46,13 @@ namespace Shadowrun {
       let b: number = (235 / 255);
       let cmpLightAmbient: ƒ.ComponentLight = new ƒ.ComponentLight(new ƒ.LightAmbient(new ƒ.Color(r, g, b, 0.1)));
       this.addComponent(cmpLightAmbient);
-      let cmpLightPoint: ƒ.ComponentLight = new ƒ.ComponentLight(new ƒ.LightPoint(new ƒ.Color(r, g, b, 1)));
-      this.addComponent(cmpLightPoint);
-      cmpLightPoint.mtxPivot.translateY(2);
-      cmpLightPoint.mtxPivot.translateX(10);
-      cmpLightPoint.mtxPivot.translateZ(10);
+      let cmpLightDirect: ƒ.ComponentLight = new ƒ.ComponentLight(new ƒ.LightDirectional(new ƒ.Color(r, g, b, 0.75)));
+      this.addComponent(cmpLightDirect);
+      cmpLightDirect.mtxPivot.translateY(2);
+      cmpLightDirect.mtxPivot.translateX(10);
+      cmpLightDirect.mtxPivot.translateZ(10);
+      cmpLightDirect.mtxPivot.rotateY(150);
+      cmpLightDirect.mtxPivot.rotateX(42);
     }
 
     static getInstance(): Arena {
