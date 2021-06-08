@@ -6,14 +6,14 @@ var Shadowrun;
     let viewport = new ƒ.Viewport();
     let game = new ƒ.Node("Game");
     let arena = new ƒ.Node("Arena");
+    let cmpCamera = new ƒ.ComponentCamera();
     function init(_event) {
         const canvas = document.querySelector("canvas");
-        let cmpCamera = new ƒ.ComponentCamera();
         cmpCamera.mtxPivot.translateX(30);
         cmpCamera.mtxPivot.translateY(30);
         cmpCamera.mtxPivot.translateZ(30);
         cmpCamera.mtxPivot.rotateY(180 + 45);
-        cmpCamera.mtxPivot.rotateX(45);
+        cmpCamera.mtxPivot.rotateX(40);
         console.log(cmpCamera);
         arena = Shadowrun.Arena.getInstance();
         game.addChild(arena);
@@ -24,6 +24,11 @@ var Shadowrun;
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
     }
     function update(_event) {
+        let offset = 20 * ƒ.Loop.timeFrameReal / 1000;
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT]))
+            arena.mtxLocal.rotateY(-offset);
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]))
+            arena.mtxLocal.rotateY(+offset);
         viewport.draw();
     }
 })(Shadowrun || (Shadowrun = {}));
