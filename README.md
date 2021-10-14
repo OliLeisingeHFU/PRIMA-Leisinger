@@ -1,2 +1,1 @@
-# Prima Oliver Leisinger
-Repository for the module "Prototyping interactive media-applications and games" at Furtwangen University
+# PRIMA_WS21-22
