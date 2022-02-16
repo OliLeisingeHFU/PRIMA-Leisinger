@@ -1,12 +1,12 @@
-namespace LaserLeague {
+namespace Pinball {
   import ƒ = FudgeCore;
   import ƒui = FudgeUserInterface;
 
   export class GameState extends ƒ.Mutable {
     private static controller: ƒui.Controller;
     private static instance: GameState;
-    public name: string = "LaserLeague";
-    public health: number = 1;
+    public name: string = "PinBall";
+    public points: number = 0;
 
     private constructor() {
       super();

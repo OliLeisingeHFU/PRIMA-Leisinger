@@ -59,9 +59,10 @@ namespace Script {
         switch(this.node.getComponent(Script.CollisionHandler).objectType){
           case "Bumper":
             collider.applyLinearImpulse(ƒ.Vector3.SCALE(collider.getVelocity(), -20));
-            console.log("Bump!");
+            Pinball.GameState.get().points += 5;
             break;
           case "Coin":
+            Pinball.GameState.get().points += 10;
             console.log("Coin!");
             break;
           case "Multiball":

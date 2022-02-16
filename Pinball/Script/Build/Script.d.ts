@@ -19,5 +19,17 @@ declare namespace Script {
 }
 declare namespace Pinball {
     import ƒ = FudgeCore;
+    class GameState extends ƒ.Mutable {
+        private static controller;
+        private static instance;
+        name: string;
+        points: number;
+        private constructor();
+        static get(): GameState;
+        protected reduceMutator(_mutator: ƒ.Mutator): void;
+    }
+}
+declare namespace Pinball {
+    import ƒ = FudgeCore;
     function addColliders(_nodes: ƒ.Node[], _mass?: number, _type?: ƒ.BODY_TYPE, _colliderType?: ƒ.COLLIDER_TYPE, _trigger?: boolean): void;
 }

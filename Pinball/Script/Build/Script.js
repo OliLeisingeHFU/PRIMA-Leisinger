@@ -83,7 +83,7 @@ var Script;
                 switch (this.node.getComponent(Script.CollisionHandler).objectType) {
                     case "Bumper":
                         collider.applyLinearImpulse(ƒ.Vector3.SCALE(collider.getVelocity(), -20));
-                        console.log("Bump!");
+                        Pinball.GameState.get().points += 5;
                         break;
                     case "Coin":
                         console.log("Coin!");
@@ -102,6 +102,30 @@ var Script;
 var Pinball;
 (function (Pinball) {
     var ƒ = FudgeCore;
+    var ƒui = FudgeUserInterface;
+    class GameState extends ƒ.Mutable {
+        static controller;
+        static instance;
+        name = "PinBall";
+        points = 0;
+        constructor() {
+            super();
+            let domHud = document.querySelector("#Hud");
+            GameState.instance = this;
+            GameState.controller = new ƒui.Controller(this, domHud);
+            console.log("Hud-Controller", GameState.controller);
+        }
+        static get() {
+            return GameState.instance || new GameState();
+        }
+        reduceMutator(_mutator) { }
+    }
+    Pinball.GameState = GameState;
+})(Pinball || (Pinball = {}));
+var Pinball;
+(function (Pinball) {
+    var ƒ = FudgeCore;
+    //import ƒui = FudgeUserInterface;
     ƒ.Debug.info("Main Program Template running!");
     // important Variables
     let viewport;
@@ -111,7 +135,6 @@ var Pinball;
     let right;
     let spring;
     let force = 0;
-    let points = 0;
     window.addEventListener("load", init);
     function init(_event) {
         let dialog = document.querySelector("dialog");
