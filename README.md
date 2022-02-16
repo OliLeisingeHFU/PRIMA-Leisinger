@@ -33,13 +33,15 @@ Scene
       Ball
     Spring
     Barriers
-      Top
-      Bottom
-      Left
-      Right
-      Ballguides
-        Ballguide Left
-        Ballguide Right
+      Case
+        Top
+        Bottom
+        Left
+        Right
+        Ground
+        Glass
+        BallguideLeft
+        BallguideRight
       Corners
         BotLeft
         BotRight
@@ -63,4 +65,34 @@ Initially it seems having a single Ball inside the Balls node seems like the Bal
 3. After the Arena was built upright during development, all that was needed to give it the same angle as a real Pinball machine, was to rotate the Arenas ComponentTransform. This makes proper positioning of objects easier, both before and after the Arena was rotated.
 
 ## 2. Editor
-The Arena is built using the Editor. This is much easier than using code if you build something that is not symmetrical, especially if someone, like me, is not that good at imagining how it will look. But it's still fairly simple when making a symmetrical environment. That is why all ComponentTransforms are added in the editor by hand, as they were used to build the environment. ComponentRigidBody on the other hand is easier to use in code, because I have several of the same object in different places. that way adding colliders by code and having them be the same is easier than doing it by hand. Testing and changing values is also faster using code.
+The Arena is built using the Editor. This is much easier than using code if you build something that is not symmetrical. But it's still fairly simple when making a symmetrical environment. That is why all ComponentTransforms are added in the editor by hand, as they were used to build the environment. ComponentRigidBody on the other hand is easier to use in code, because I have several of the same object in different places. That way adding colliders by code and having them be the same is easier than doing it by hand. Testing and changing values is also faster using code.
+Furthermore, objects of variable number, in this case the pinballs are also better added and removed by code, rather than the editor. The coins and the Multiball pickups on the other hand don't get deleted, they are simply disabled for some time, as their position, unlike the balls, never changes when reappearing. The balls on the other hand need to be deleted, since they are affected by gravity.
+
+## 3. Scriptcomponents
+I used scriptcomponents to program the different powerups avaliable. In this project scriptcomponents where useful, because I was able to give the Bumpers, Coins and other Pickups a Scriptcomponent, rather than having to write a class for each of them, then generating them inside the code.
+EXPLAIN HOW POWERUPS WHERE PROGRAMMED.
+
+## 4. Extend
+I extended the Ball class from ƒ.Node. It was in that way useful to me, as the pinballs are objects of variable number and they can be generated more easily, when they are their own class. Furthermore, multihit combos can be tracked for each ball, as they all have their own multihit-attribute.
+
+## 5. Sound
+In this project, the users perspective always stays the same, therefore sound always comes from the same direction respective to the users perception. The placement was simply done on an object that can quickly be reached codewise, when sound needs to be played.
+There are 3 different sounds, a "pling" to indicate a bumper has been hit, and points are gained, a coin sound, similar to Super Mario, to indicate a coin is picked up, and one to indicate a power up has been picked up.
+
+## 6. VUI
+STILL MISSING
+
+## 7. Event-System
+STILL MISSING
+
+## 8. External Data
+The following Parameters are saved in an external file: BumperValue, CoinTime and BallWeight. BumperValue and CoinTime are "balancing parameter" that influence point gain and time needed to collect all 5 coins for the power-up respectively. BallWeight is a physics parameters that influence how actually playing feels like. The higher this value, the faster the ball will roll down the arena.
+
+## 9. Light
+Everything should be nicely visible, and importantly, not confusing, therefore only 2 lights are used. One ambient light for a basic light level, as well as one directional light to make sure shadows are visible, and the player can recognize the shape of objects.
+
+## A. Physics
+Every object has a rigidbody, aside from the ball, which is dynamic, all are static. forces are used on the ball when shooting it from the spring, as well as on the flippers, so that they are stronger (especially with extra force pickup). Colisions on Bumpers for points.
+
+## D. Animations
+STILL MISSING

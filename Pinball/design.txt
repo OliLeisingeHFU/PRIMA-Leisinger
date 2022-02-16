@@ -38,10 +38,9 @@
 
 10. Sizes & Positioning.
   0/0/0 = Where the ball goes when you lose, between Flippers
-  1 = length of Flipper (and standard obstacle)
+  1 = ball diameter
 
 11. Event System
-  Flippers: onkeydown
   points: collision with obstacle
 
 12. Getting points
