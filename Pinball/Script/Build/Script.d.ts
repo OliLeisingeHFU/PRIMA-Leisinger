@@ -24,8 +24,10 @@ declare namespace Pinball {
         private static instance;
         name: string;
         points: number;
+        lives: number;
         private constructor();
         static get(): GameState;
+        static newGame(): void;
         protected reduceMutator(_mutator: ƒ.Mutator): void;
     }
 }

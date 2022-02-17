@@ -2,7 +2,6 @@ namespace Pinball {
   import ƒ = FudgeCore;
   //import ƒui = FudgeUserInterface;
 
-  ƒ.Debug.info("Main Program Template running!");
 // important Variables
   let viewport: ƒ.Viewport;
   let graph: ƒ.Node;
@@ -115,14 +114,17 @@ namespace Pinball {
     let y = leftY.y;
     let z = leftY.z;
     console.log("x: " + x + " y: " + y + " z: " + z);
-    _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), (colV * 50))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
+    _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), (colV * 500))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
   }
 
   function update(_event: Event): void {
     let inactiveBall: boolean = false;
-    if(!arena.getChildrenByName("Balls")[0].getChildren()[0]){ //check if at least one ball exists
+    if(!arena.getChildrenByName("Balls")[0].getChildren()[0] && GameState.get().lives > 0){ //check if at least one ball exists
       // spawn new ball if none exist
       arena.getChildrenByName("Balls")[0].addChild(new Ball());
+      GameState.get().lives -= 1;
+    }else if(GameState.get().lives == 0){
+      GameState.newGame();
     }
     arena.getChildrenByName("Balls")[0].getChildren().forEach(function(ball){
       spring.getComponent(ƒ.ComponentRigidbody).collisions.forEach(function(col){
@@ -137,8 +139,8 @@ namespace Pinball {
         ball.getParent().removeChild(ball);
       }
     });
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 500 && inactiveBall){
-      force += 10;
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 5000 && inactiveBall){
+      force += 100;
     }else if(force > 0 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])){
       let ball: ƒ.Node = arena.getChildrenByName("Balls")[0].getChild(0);
       ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), force));

@@ -6,10 +6,13 @@ namespace Pinball {
     private static controller: ƒui.Controller;
     private static instance: GameState;
     public name: string = "PinBall";
-    public points: number = 0;
+    public points: number;
+    public lives: number;
 
     private constructor() {
       super();
+      this.points = 0;
+      this.lives = 4;
       let domHud: HTMLDivElement = document.querySelector("#Hud");
       GameState.instance = this;
       GameState.controller = new ƒui.Controller(this, domHud);
@@ -18,6 +21,10 @@ namespace Pinball {
 
     public static get(): GameState {
       return GameState.instance || new GameState();
+    }
+
+    public static newGame(): void{
+      GameState.instance = null;
     }
 
     protected reduceMutator(_mutator: ƒ.Mutator): void {/* */ }

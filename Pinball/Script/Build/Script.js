@@ -2,15 +2,13 @@
 var Pinball;
 (function (Pinball) {
     var ƒ = FudgeCore;
-    let mesh = new ƒ.ComponentMesh(new ƒ.MeshSphere);
-    let material = new ƒ.ComponentMaterial(new ƒ.Material("pinball", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(0.9, 0.9, 0.9, 1))));
     class Ball extends ƒ.Node {
         multihit;
         constructor(_pos) {
             super("Ball");
             this.multihit = 1;
-            this.addComponent(mesh);
-            this.addComponent(material);
+            this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshSphere));
+            this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("pinball", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(0.9, 0.9, 0.9, 1)))));
             this.addComponent(new ƒ.ComponentTransform());
             if (!_pos) {
                 this.mtxLocal.translateX(13.4);
@@ -21,7 +19,7 @@ var Pinball;
                 this.mtxLocal.translateY(_pos.y);
                 this.mtxLocal.translateZ(_pos.z);
             }
-            Pinball.addColliders([this], 10, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
+            Pinball.addColliders([this], 100, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
         }
     }
     Pinball.Ball = Ball;
@@ -78,18 +76,37 @@ var Script;
         }
         colHndEvent(_event) {
             let collider = _event.cmpRigidbody;
+            let vel = collider.getVelocity();
             if (collider.node.name == "Ball") {
                 this.node.getParent().getComponent(ƒ.ComponentAudio).play(true);
                 switch (this.node.getComponent(Script.CollisionHandler).objectType) {
                     case "Bumper":
-                        collider.applyLinearImpulse(ƒ.Vector3.SCALE(collider.getVelocity(), -20));
+                        collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * -200, vel.z * -200)); //ƒ.Vector3.SCALE(collider.getVelocity(), -200)
                         Pinball.GameState.get().points += 5;
                         break;
                     case "Coin":
-                        console.log("Coin!");
+                        Pinball.GameState.get().points += 10;
+                        this.activate(false);
+                        setTimeout(function () { this.activate(true); }, 10000);
                         break;
                     case "Multiball":
-                        console.log("Balls!");
+                        this.node.activate(false);
+                        this.activate(false);
+                        setTimeout(function () {
+                            console.log(this.node);
+                            this.node.activate(true);
+                            this.activate(true);
+                        }, 10000);
+                        for (let i = 1; i < 3; i++) {
+                            setTimeout(function () {
+                                let pos = collider.node.mtxLocal.translation;
+                                setTimeout(function () {
+                                    let ball = new Pinball.Ball(pos);
+                                    collider.node.getParent().appendChild(ball);
+                                    ball.getComponent(ƒ.ComponentRigidbody).addVelocity(new ƒ.Vector3(vel.x, (vel.y * (Math.random() * 20 - 10)), (vel.z * (Math.random() * 20 - 10))));
+                                }, (i * 750));
+                            }, (i * 750));
+                        }
                         break;
                     default:
                         break;
@@ -107,9 +124,12 @@ var Pinball;
         static controller;
         static instance;
         name = "PinBall";
-        points = 0;
+        points;
+        lives;
         constructor() {
             super();
+            this.points = 0;
+            this.lives = 4;
             let domHud = document.querySelector("#Hud");
             GameState.instance = this;
             GameState.controller = new ƒui.Controller(this, domHud);
@@ -117,6 +137,9 @@ var Pinball;
         }
         static get() {
             return GameState.instance || new GameState();
+        }
+        static newGame() {
+            GameState.instance = null;
         }
         reduceMutator(_mutator) { }
     }
@@ -126,7 +149,6 @@ var Pinball;
 (function (Pinball) {
     var ƒ = FudgeCore;
     //import ƒui = FudgeUserInterface;
-    ƒ.Debug.info("Main Program Template running!");
     // important Variables
     let viewport;
     let graph;
@@ -227,13 +249,17 @@ var Pinball;
         let y = leftY.y;
         let z = leftY.z;
         console.log("x: " + x + " y: " + y + " z: " + z);
-        _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), (colV * 50))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
+        _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), (colV * 500))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
     }
     function update(_event) {
         let inactiveBall = false;
-        if (!arena.getChildrenByName("Balls")[0].getChildren()[0]) { //check if at least one ball exists
+        if (!arena.getChildrenByName("Balls")[0].getChildren()[0] && Pinball.GameState.get().lives > 0) { //check if at least one ball exists
             // spawn new ball if none exist
             arena.getChildrenByName("Balls")[0].addChild(new Pinball.Ball());
+            Pinball.GameState.get().lives -= 1;
+        }
+        else if (Pinball.GameState.get().lives == 0) {
+            Pinball.GameState.newGame();
         }
         arena.getChildrenByName("Balls")[0].getChildren().forEach(function (ball) {
             spring.getComponent(ƒ.ComponentRigidbody).collisions.forEach(function (col) {
@@ -247,8 +273,8 @@ var Pinball;
                 ball.getParent().removeChild(ball);
             }
         });
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 500 && inactiveBall) {
-            force += 10;
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 5000 && inactiveBall) {
+            force += 100;
         }
         else if (force > 0 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])) {
             let ball = arena.getChildrenByName("Balls")[0].getChild(0);

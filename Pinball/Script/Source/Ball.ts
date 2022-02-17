@@ -1,7 +1,5 @@
 namespace Pinball {
   import ƒ = FudgeCore;
-  let mesh : ƒ.ComponentMesh = new ƒ.ComponentMesh(new ƒ.MeshSphere);
-  let material: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(new ƒ.Material("pinball", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(0.9, 0.9, 0.9, 1))));
 
   export class Ball extends ƒ.Node {
     public multihit: number;
@@ -9,8 +7,8 @@ namespace Pinball {
       super("Ball");
       this.multihit = 1;
 
-      this.addComponent(mesh);
-      this.addComponent(material);
+      this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshSphere));
+      this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("pinball", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(0.9, 0.9, 0.9, 1)))));
       this.addComponent(new ƒ.ComponentTransform());
 
       if(!_pos){
@@ -21,7 +19,7 @@ namespace Pinball {
         this.mtxLocal.translateY(_pos.y);
         this.mtxLocal.translateZ(_pos.z);
       }
-      addColliders([this], 10, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
+      addColliders([this], 100, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
     }
   }
 }

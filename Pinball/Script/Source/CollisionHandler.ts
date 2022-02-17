@@ -54,19 +54,39 @@ namespace Script {
 
     private colHndEvent(_event: ƒ.EventPhysics){
       let collider: ƒ.ComponentRigidbody = _event.cmpRigidbody;
+      let vel: ƒ.Vector3 = collider.getVelocity();
       if(collider.node.name == "Ball"){
         this.node.getParent().getComponent(ƒ.ComponentAudio).play(true);
         switch(this.node.getComponent(Script.CollisionHandler).objectType){
           case "Bumper":
-            collider.applyLinearImpulse(ƒ.Vector3.SCALE(collider.getVelocity(), -20));
+            
+            collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * -200, vel.z * -200)); //ƒ.Vector3.SCALE(collider.getVelocity(), -200)
             Pinball.GameState.get().points += 5;
             break;
           case "Coin":
             Pinball.GameState.get().points += 10;
-            console.log("Coin!");
+            this.activate(false);
+            setTimeout(function(){this.activate(true);}, 10000);
             break;
           case "Multiball":
-            console.log("Balls!");
+            this.node.activate(false);
+            this.activate(false);
+            setTimeout(function(){
+              console.log(this.node);
+              this.node.activate(true);
+              this.activate(true);
+            }, 10000);
+
+            for(let i = 1; i < 3; i++){
+              setTimeout(function(){
+                let pos = collider.node.mtxLocal.translation;
+                setTimeout(function(){
+                  let ball = new Pinball.Ball(pos);
+                  collider.node.getParent().appendChild(ball);
+                  ball.getComponent(ƒ.ComponentRigidbody).addVelocity(new ƒ.Vector3(vel.x, (vel.y * (Math.random() * 20 - 10)), (vel.z * (Math.random() * 20 - 10))));
+                }, (i * 750));
+              }, (i * 750));
+            }
             break;
           default:
             break;
