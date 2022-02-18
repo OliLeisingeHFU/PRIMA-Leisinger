@@ -2,12 +2,19 @@ namespace Script {
   import ƒ = FudgeCore;
   ƒ.Project.registerScriptNamespace(Script);  // Register the namespace to FUDGE for serialization
 
+  interface Values{
+    bumperValue: number;
+    coinValue: number;
+    coinTime: number;
+  }
+
   export class CollisionHandler extends ƒ.ComponentScript {
     // Register the script as component for use in the editor via drag&drop
     public static readonly iSubclass: number = ƒ.Component.registerSubclass(CollisionHandler);
     // Properties may be mutated by users in the editor via the automatically created user interface
     public message: string = "CollisionHandler added to ";
     public objectType: String;
+    public static val: Values;
 
     constructor(_type?: String) {
       super();
@@ -52,6 +59,11 @@ namespace Script {
       }
     }
 
+    public static async loadValues(): Promise<void>{
+      let response: Response = await fetch("Script/pointBalancing.json");
+      CollisionHandler.val = await response.json();
+    }
+
     private colHndEvent(_event: ƒ.EventPhysics){
       let collider: ƒ.ComponentRigidbody = _event.cmpRigidbody;
       let vel: ƒ.Vector3 = collider.getVelocity();
@@ -60,13 +72,13 @@ namespace Script {
         switch(this.node.getComponent(Script.CollisionHandler).objectType){
           case "Bumper":
             
-            collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * -200, vel.z * -200)); //ƒ.Vector3.SCALE(collider.getVelocity(), -200)
-            Pinball.GameState.get().points += 5;
+            collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * Pinball.timesWeight(-3.5), vel.z * Pinball.timesWeight(-3.5))); //ƒ.Vector3.SCALE(collider.getVelocity(), -200)
+            Pinball.GameState.get().points += CollisionHandler.val.bumperValue;
             break;
           case "Coin":
-            Pinball.GameState.get().points += 10;
+            Pinball.GameState.get().points += CollisionHandler.val.coinValue;
             this.activate(false);
-            setTimeout(function(){this.activate(true);}, 10000);
+            setTimeout(function(){this.activate(true);}, Pinball.inSeconds(CollisionHandler.val.coinTime));
             break;
           case "Multiball":
             this.node.activate(false);
@@ -93,7 +105,6 @@ namespace Script {
         }
       }
     }
-
 
     // protected reduceMutator(_mutator: ƒ.Mutator): void {
     //   // delete properties that should not be mutated

@@ -1292,8 +1292,7 @@
                                 }
                               }
                             }
-                          ],
-                          "CollisionHandler": []
+                          ]
                         },
                         "children": []
                       }
@@ -1348,8 +1347,7 @@
                                 }
                               }
                             }
-                          ],
-                          "CollisionHandler": []
+                          ]
                         },
                         "children": []
                       }
@@ -1404,8 +1402,7 @@
                                 }
                               }
                             }
-                          ],
-                          "CollisionHandler": []
+                          ]
                         },
                         "children": []
                       }
@@ -1460,8 +1457,7 @@
                                 }
                               }
                             }
-                          ],
-                          "CollisionHandler": []
+                          ]
                         },
                         "children": []
                       }
@@ -1516,8 +1512,7 @@
                                 }
                               }
                             }
-                          ],
-                          "CollisionHandler": []
+                          ]
                         },
                         "children": []
                       }
@@ -1585,8 +1580,7 @@
                                       }
                                     }
                                   }
-                                ],
-                                "CollisionHandler": []
+                                ]
                               },
                               "children": []
                             }
@@ -1641,8 +1635,7 @@
                                       }
                                     }
                                   }
-                                ],
-                                "CollisionHandler": []
+                                ]
                               },
                               "children": []
                             }
@@ -1697,8 +1690,7 @@
                                       }
                                     }
                                   }
-                                ],
-                                "CollisionHandler": []
+                                ]
                               },
                               "children": []
                             }
@@ -1753,8 +1745,7 @@
                                       }
                                     }
                                   }
-                                ],
-                                "CollisionHandler": []
+                                ]
                               },
                               "children": []
                             }
@@ -1809,8 +1800,7 @@
                                       }
                                     }
                                   }
-                                ],
-                                "CollisionHandler": []
+                                ]
                               },
                               "children": []
                             }
@@ -1868,8 +1858,7 @@
                                 "idMaterial": "Material|2022-01-19T19:33:14.699Z|71691"
                               }
                             }
-                          ],
-                          "CollisionHandler": []
+                          ]
                         },
                         "children": [
                           {
@@ -2064,88 +2053,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "ƒ.Node": {
-            "name": "Helper000",
-            "components": {
-              "ComponentMesh": [
-                {
-                  "ƒ.ComponentMesh": {
-                    "idMesh": "MeshCube|2022-01-03T11:23:43.821Z|48541",
-                    "pivot": {
-                      "translation": "[0, 0, 0]",
-                      "rotation": "[0, 0, 0]",
-                      "scaling": "[0.19999992847442627, 0.19999992847442627, 16]"
-                    },
-                    "Component": {
-                      "active": true
-                    }
-                  }
-                }
-              ],
-              "ComponentMaterial": [
-                {
-                  "ƒ.ComponentMaterial": {
-                    "sortForAlpha": false,
-                    "clrPrimary": "[1, 0, 1, 1]",
-                    "clrSecondary": "[1, 1, 1, 1]",
-                    "pivot": {
-                      "translation": "[0, 0]",
-                      "rotation": 0,
-                      "scaling": "[1, 1]"
-                    },
-                    "Component": {
-                      "active": true
-                    },
-                    "idMaterial": "Material|2021-12-28T12:22:10.438Z|92851"
-                  }
-                }
-              ]
-            },
-            "children": []
-          }
-        },
-        {
-          "ƒ.Node": {
-            "name": "Helper000",
-            "components": {
-              "ComponentMesh": [
-                {
-                  "ƒ.ComponentMesh": {
-                    "idMesh": "MeshCube|2022-01-03T11:23:43.821Z|48541",
-                    "pivot": {
-                      "translation": "[0, 0, 0]",
-                      "rotation": "[0, 0, 0]",
-                      "scaling": "[0.19999992847442627, 16, 0.20000076293945312]"
-                    },
-                    "Component": {
-                      "active": true
-                    }
-                  }
-                }
-              ],
-              "ComponentMaterial": [
-                {
-                  "ƒ.ComponentMaterial": {
-                    "sortForAlpha": false,
-                    "clrPrimary": "[1, 0, 1, 1]",
-                    "clrSecondary": "[1, 1, 1, 1]",
-                    "pivot": {
-                      "translation": "[0, 0]",
-                      "rotation": 0,
-                      "scaling": "[1, 1]"
-                    },
-                    "Component": {
-                      "active": true
-                    },
-                    "idMaterial": "Material|2021-12-28T12:22:10.438Z|92851"
-                  }
-                }
-              ]
-            },
-            "children": []
           }
         }
       ],

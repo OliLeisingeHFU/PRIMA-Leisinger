@@ -1,8 +1,14 @@
 namespace Pinball {
   import ƒ = FudgeCore;
 
+  interface Values {
+    weight: number;
+  }
+
   export class Ball extends ƒ.Node {
     public multihit: number;
+    public static val: Values;
+
     constructor(_pos?: ƒ.Vector3) {
       super("Ball");
       this.multihit = 1;
@@ -19,7 +25,12 @@ namespace Pinball {
         this.mtxLocal.translateY(_pos.y);
         this.mtxLocal.translateZ(_pos.z);
       }
-      addColliders([this], 100, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
+      addColliders([this], Ball.val.weight, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
+    }
+
+    public static async loadValues(): Promise<void>{
+      let response: Response = await fetch("Script/physics.json");
+      Ball.val = await response.json();
     }
   }
 }

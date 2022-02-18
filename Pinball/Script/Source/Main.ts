@@ -26,6 +26,9 @@ namespace Pinball {
 
   async function start(_event: CustomEvent): Promise<void> {
     await FudgeCore.Project.loadResourcesFromHTML();
+    await Ball.loadValues();
+    await Script.CollisionHandler.loadValues();
+
     graph = <ƒ.Graph>ƒ.Project.resources[document.head.querySelector("meta[autoView]").getAttribute("autoView")];
     arena = graph.getChildrenByName("Arena")[0];
     // initialize Camera
@@ -74,6 +77,7 @@ namespace Pinball {
     arena.getChildrenByName("Bumpers")[0].addComponent(new ƒ.ComponentAudio(new ƒ.Audio("./Sound/Effects/pling.wav"), false, false));
     pickups.getChildrenByName("Coins")[0].addComponent(new ƒ.ComponentAudio(new ƒ.Audio("./Sound/Effects/coin.wav"), false, false));
     pickups.addComponent(new ƒ.ComponentAudio(new ƒ.Audio("./Sound/Effects/power-up.wav"), false, false));
+
     // start game
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -106,15 +110,23 @@ namespace Pinball {
     });
   }
 
+  export function timesWeight(_val: number): number{
+    return _val *  Ball.val.weight;
+  }
+
+  export function inSeconds(_val: number): number{
+    return _val * 1000;
+  }
+
   function flipBall(_col: ƒ.ComponentRigidbody, _flipper: ƒ.Node): void{
-    let colV = 2;//_col.getVelocity().magnitude;
+    let colV = 5;//_col.getVelocity().magnitude;
     //console.log(colV);
     let leftY = _flipper.mtxWorld.getY();
     let x = leftY.x;
     let y = leftY.y;
     let z = leftY.z;
     console.log("x: " + x + " y: " + y + " z: " + z);
-    _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), (colV * 500))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
+    _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), timesWeight(colV * 5))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
   }
 
   function update(_event: Event): void {
@@ -139,11 +151,11 @@ namespace Pinball {
         ball.getParent().removeChild(ball);
       }
     });
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 5000 && inactiveBall){
-      force += 100;
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 50 && inactiveBall){
+      force += 5;
     }else if(force > 0 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])){
       let ball: ƒ.Node = arena.getChildrenByName("Balls")[0].getChild(0);
-      ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), force));
+      ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), timesWeight(force)));
       console.log("shoot with force: " + force);
       force = 0;
     }

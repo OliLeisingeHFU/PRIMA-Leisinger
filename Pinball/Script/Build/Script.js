@@ -4,6 +4,7 @@ var Pinball;
     var ƒ = FudgeCore;
     class Ball extends ƒ.Node {
         multihit;
+        static val;
         constructor(_pos) {
             super("Ball");
             this.multihit = 1;
@@ -19,7 +20,11 @@ var Pinball;
                 this.mtxLocal.translateY(_pos.y);
                 this.mtxLocal.translateZ(_pos.z);
             }
-            Pinball.addColliders([this], 100, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
+            Pinball.addColliders([this], Ball.val.weight, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
+        }
+        static async loadValues() {
+            let response = await fetch("Script/ballValues.json");
+            Ball.val = await response.json();
         }
     }
     Pinball.Ball = Ball;
@@ -34,6 +39,7 @@ var Script;
         // Properties may be mutated by users in the editor via the automatically created user interface
         message = "CollisionHandler added to ";
         objectType;
+        static val;
         constructor(_type) {
             super();
             if (_type) {
@@ -74,6 +80,10 @@ var Script;
                     break;
             }
         }
+        static async loadValues() {
+            let response = await fetch("Script/pointBalancing.json");
+            CollisionHandler.val = await response.json();
+        }
         colHndEvent(_event) {
             let collider = _event.cmpRigidbody;
             let vel = collider.getVelocity();
@@ -81,13 +91,13 @@ var Script;
                 this.node.getParent().getComponent(ƒ.ComponentAudio).play(true);
                 switch (this.node.getComponent(Script.CollisionHandler).objectType) {
                     case "Bumper":
-                        collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * -200, vel.z * -200)); //ƒ.Vector3.SCALE(collider.getVelocity(), -200)
-                        Pinball.GameState.get().points += 5;
+                        collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * Pinball.timesWeight(-3.5), vel.z * Pinball.timesWeight(-3.5))); //ƒ.Vector3.SCALE(collider.getVelocity(), -200)
+                        Pinball.GameState.get().points += CollisionHandler.val.bumperValue;
                         break;
                     case "Coin":
-                        Pinball.GameState.get().points += 10;
+                        Pinball.GameState.get().points += CollisionHandler.val.coinValue;
                         this.activate(false);
-                        setTimeout(function () { this.activate(true); }, 10000);
+                        setTimeout(function () { this.activate(true); }, Pinball.inSeconds(CollisionHandler.val.coinTime));
                         break;
                     case "Multiball":
                         this.node.activate(false);
@@ -171,6 +181,8 @@ var Pinball;
     }
     async function start(_event) {
         await FudgeCore.Project.loadResourcesFromHTML();
+        await Pinball.Ball.loadValues();
+        await Script.CollisionHandler.loadValues();
         graph = ƒ.Project.resources[document.head.querySelector("meta[autoView]").getAttribute("autoView")];
         arena = graph.getChildrenByName("Arena")[0];
         // initialize Camera
@@ -241,15 +253,23 @@ var Pinball;
             object.addComponent(new Script.CollisionHandler(_type));
         });
     }
+    function timesWeight(_val) {
+        return _val * Pinball.Ball.val.weight;
+    }
+    Pinball.timesWeight = timesWeight;
+    function inSeconds(_val) {
+        return _val * 1000;
+    }
+    Pinball.inSeconds = inSeconds;
     function flipBall(_col, _flipper) {
-        let colV = 2; //_col.getVelocity().magnitude;
+        let colV = 5; //_col.getVelocity().magnitude;
         //console.log(colV);
         let leftY = _flipper.mtxWorld.getY();
         let x = leftY.x;
         let y = leftY.y;
         let z = leftY.z;
         console.log("x: " + x + " y: " + y + " z: " + z);
-        _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), (colV * 500))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
+        _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), timesWeight(colV * 5))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
     }
     function update(_event) {
         let inactiveBall = false;
@@ -273,12 +293,12 @@ var Pinball;
                 ball.getParent().removeChild(ball);
             }
         });
-        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 5000 && inactiveBall) {
-            force += 100;
+        if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 50 && inactiveBall) {
+            force += 5;
         }
         else if (force > 0 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])) {
             let ball = arena.getChildrenByName("Balls")[0].getChild(0);
-            ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), force));
+            ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), timesWeight(force)));
             console.log("shoot with force: " + force);
             force = 0;
         }
