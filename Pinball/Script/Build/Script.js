@@ -263,7 +263,6 @@ var Pinball;
         let canvas = document.querySelector("canvas");
         viewport = new ƒ.Viewport();
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
-        viewport.physicsDebugMode = ƒ.PHYSICS_DEBUGMODE.COLLIDERS;
         ƒ.AudioManager.default.listenTo(graph);
         ƒ.AudioManager.default.listenWith(graph.getComponent(ƒ.ComponentAudioListener));
         // initialize physics
@@ -313,7 +312,6 @@ var Pinball;
                 cmpRigidBody.initialization = ƒ.BODY_INIT.TO_MESH;
                 cmpRigidBody.isInitialized = false;
                 object.addComponent(cmpRigidBody);
-                console.log(cmpRigidBody);
             }
         });
     }
@@ -393,7 +391,6 @@ var Pinball;
         else if (Pinball.GameState.get().force > 15 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])) {
             let ball = arena.getChildrenByName("Balls")[0].getChild(0);
             ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), timesWeight(Pinball.GameState.get().force)));
-            console.log("shoot with force: " + Pinball.GameState.get().force);
             setTimeout(function () {
                 addColliders(arena.getChildrenByName("LaunchCloser")[0].getChildren(), undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
             }, 2250);
@@ -466,7 +463,8 @@ var Pinball;
             Pinball.addColliders([this], 1, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, true);
             switch (this.name) {
                 case "MultiballAbility":
-                    this.mtxLocal.translateY(38);
+                    this.mtxLocal.translateX(-4);
+                    this.mtxLocal.translateY(30);
                     this.addComponent(new ƒ.ComponentMaterial(this.matMult));
                     this.addComponent(new Script.CollisionHandler("Multiball"));
                     break;

@@ -17,7 +17,8 @@ namespace Pinball {
 
       switch(this.name){
         case "MultiballAbility":
-          this.mtxLocal.translateY(38);
+          this.mtxLocal.translateX(-4);
+          this.mtxLocal.translateY(30);
           this.addComponent(new ƒ.ComponentMaterial(this.matMult));
           this.addComponent(new Script.CollisionHandler("Multiball"));
           break;

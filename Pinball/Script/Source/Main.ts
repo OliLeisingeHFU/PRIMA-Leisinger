@@ -41,7 +41,6 @@ namespace Pinball {
     let canvas: HTMLCanvasElement = document.querySelector("canvas");
     viewport = new ƒ.Viewport();
     viewport.initialize("Viewport", graph, cmpCamera, canvas);
-    viewport.physicsDebugMode = ƒ.PHYSICS_DEBUGMODE.COLLIDERS;
     ƒ.AudioManager.default.listenTo(graph);
     ƒ.AudioManager.default.listenWith(graph.getComponent(ƒ.ComponentAudioListener));
 
@@ -100,7 +99,6 @@ namespace Pinball {
         cmpRigidBody.isInitialized = false;
         
         object.addComponent(cmpRigidBody);
-        console.log(cmpRigidBody);
       }
     });
   }
@@ -181,7 +179,6 @@ namespace Pinball {
     }else if(GameState.get().force > 15 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])){
       let ball: ƒ.Node = arena.getChildrenByName("Balls")[0].getChild(0);
       ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), timesWeight(GameState.get().force)));
-      console.log("shoot with force: " + GameState.get().force);
       setTimeout(function(){
         addColliders(arena.getChildrenByName("LaunchCloser")[0].getChildren(), undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
       }, 2250);
