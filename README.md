@@ -1,12 +1,19 @@
 # PRIMA_WS21-22: Some_sort_of_Pinball_thing
 Oliver Leisinger
+
 Winter 2021/22
+
 MIB 5
+
 PRIMA
+
 Professor: Jirka R. Dell'Oro-Friedl
+
 link to executable: https://olileisingehfu.github.io/PRIMA-Leisinger/Pinball
+
 source code: https://github.com/OliLeisingeHFU/PRIMA-Leisinger/tree/main/Pinball
-design doc: UPLOAD NEEDED
+
+design doc: https://github.com/OliLeisingeHFU/PRIMA-Leisinger/blob/main/Pinball/design.pdf
 
 Interactions:
 Hold Space: load spring. (only when ball is in launch tube)
