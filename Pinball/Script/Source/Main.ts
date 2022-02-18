@@ -9,7 +9,6 @@ namespace Pinball {
   let left: ƒ.Node;
   let right: ƒ.Node;
   let spring: ƒ.Node;
-  let force: number = 0;
 
   window.addEventListener("load", init);
   function init(_event: Event): void {
@@ -55,18 +54,18 @@ namespace Pinball {
     addColliders(arena.getChildrenByName("Spring"), undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
 
     let pickups: ƒ.Node = arena.getChildrenByName("Pickups")[0];
-    let coins = pickups.getChildrenByName("Coins")[0].getChildren();
-    addColliders(coins, undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, true);
-    addScriptComp(coins, "Coin");
-
-    let multiball = pickups.getChildrenByName("MultiBallAbility");
-    addColliders(multiball, undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, true);
-    addScriptComp(multiball, "Multiball");
+    pickups.addChild(new Power("MultiballAbility"));
+    pickups.addChild(new Power("ForceUpAbility"));
+    let coins = pickups.getChildrenByName("Coins")[0];
+    for(let i = 0; i < 5; i++){
+      coins.addChild(new Coin("Coin" + i));
+    }
 
     let barriers: ƒ.Node = arena.getChildrenByName("Barriers")[0];
     addColliders(barriers.getChildrenByName("Case")[0].getChildren(), undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
     addColliders(barriers.getChildrenByName("Pyramids")[0].getChildren(), undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.PYRAMID);
     addColliders(barriers.getChildrenByName("Corners")[0].getChildren(), undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
+    
 
     // Initialize Controls
     left = arena.getChildrenByName("Flippers")[0].getChildrenByName("LeftFlipper")[0];
@@ -83,11 +82,12 @@ namespace Pinball {
     ƒ.Loop.start(ƒ.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
 
+  // helper functions
   export function addColliders(_nodes: ƒ.Node[], _mass?: number, _type?: ƒ.BODY_TYPE, _colliderType?: ƒ.COLLIDER_TYPE, _trigger?: boolean): void{
     _nodes.forEach(function(object){
       if(object.cmpTransform){
         let cmpRigidBody;
-        if(_colliderType == ƒ.COLLIDER_TYPE.CONVEX){
+        if(_colliderType == ƒ.COLLIDER_TYPE.CONVEX){ //technically not needed as no MeshExtrusions are used.
           let convexMesh = object.getComponent(ƒ.ComponentMesh).mesh.vertices;
           cmpRigidBody = new ƒ.ComponentRigidbody(_mass, _type, _colliderType, undefined, undefined, convexMesh);
         }else{
@@ -100,6 +100,7 @@ namespace Pinball {
         cmpRigidBody.isInitialized = false;
         
         object.addComponent(cmpRigidBody);
+        console.log(cmpRigidBody);
       }
     });
   }
@@ -111,7 +112,7 @@ namespace Pinball {
   }
 
   export function timesWeight(_val: number): number{
-    return _val *  Ball.val.weight;
+    return _val *  Ball.val.weight * GameState.get().baseForce;
   }
 
   export function inSeconds(_val: number): number{
@@ -119,14 +120,31 @@ namespace Pinball {
   }
 
   function flipBall(_col: ƒ.ComponentRigidbody, _flipper: ƒ.Node): void{
-    let colV = 5;//_col.getVelocity().magnitude;
-    //console.log(colV);
+    let colV = 5;
     let leftY = _flipper.mtxWorld.getY();
     let x = leftY.x;
     let y = leftY.y;
     let z = leftY.z;
-    console.log("x: " + x + " y: " + y + " z: " + z);
     _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), timesWeight(colV * 5))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
+  }
+
+  export function deactivator(_node: ƒ.Node, time: number){
+    let node = _node;
+    let parent = node.getParent();
+    setTimeout(function(){
+      node.removeComponent(node.getComponent(Script.CollisionHandler));
+      node.removeComponent(node.getComponent(ƒ.ComponentRigidbody));
+      parent.removeChild(node);
+      setTimeout(function(){
+        switch(parent.name){
+          case "Coins":
+            parent.addChild(new Coin(node.name));
+            break;
+          default:
+            parent.addChild(new Power(node.name));
+        }
+      }, Pinball.inSeconds(time));
+    }, 250);
   }
 
   function update(_event: Event): void {
@@ -135,8 +153,15 @@ namespace Pinball {
       // spawn new ball if none exist
       arena.getChildrenByName("Balls")[0].addChild(new Ball());
       GameState.get().lives -= 1;
+      if(arena.getChildrenByName("LaunchCloser")[0].getChild(0).getComponent(ƒ.ComponentRigidbody)){
+        arena.getChildrenByName("LaunchCloser")[0].getChildren().forEach(function(_node){
+          _node.removeComponent(_node.getComponent(ƒ.ComponentRigidbody));
+        });
+      }
     }else if(GameState.get().lives == 0){
-      GameState.newGame();
+      alert("You gained " + GameState.get().points + " points! Good Job :) Try again?");
+      GameState.get().points = 0;
+      GameState.get().lives = 3;
     }
     arena.getChildrenByName("Balls")[0].getChildren().forEach(function(ball){
       spring.getComponent(ƒ.ComponentRigidbody).collisions.forEach(function(col){
@@ -151,35 +176,59 @@ namespace Pinball {
         ball.getParent().removeChild(ball);
       }
     });
-    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && force < 50 && inactiveBall){
-      force += 5;
-    }else if(force > 0 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])){
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE]) && GameState.get().force < 50 && inactiveBall){ // launch control
+      GameState.get().force += 1;
+    }else if(GameState.get().force > 15 && inactiveBall && !ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SPACE])){
       let ball: ƒ.Node = arena.getChildrenByName("Balls")[0].getChild(0);
-      ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), timesWeight(force)));
-      console.log("shoot with force: " + force);
-      force = 0;
+      ball.getComponent(ƒ.ComponentRigidbody).applyLinearImpulse(ƒ.Vector3.SCALE(ball.mtxWorld.getY(), timesWeight(GameState.get().force)));
+      console.log("shoot with force: " + GameState.get().force);
+      setTimeout(function(){
+        addColliders(arena.getChildrenByName("LaunchCloser")[0].getChildren(), undefined, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE);
+      }, 2250);
+      GameState.get().force = 15;
     }
 
-    if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_LEFT, ƒ.KEYBOARD_CODE.A]) && left.mtxLocal.rotation.z < 29.5){
+    // Flipper controls
+    if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A]) && left.mtxLocal.rotation.z < 29.5){
       left.mtxLocal.rotateZ(10);
       left.getComponent(ƒ.ComponentRigidbody).collisions.forEach(function(col){
         if(col.node.name == "Ball"){
           flipBall(col, left);
         }
       });
-    }else if(!ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_LEFT, ƒ.KEYBOARD_CODE.A]) && left.mtxLocal.rotation.z > 0.5){
+    }else if(!ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.D]) && left.mtxLocal.rotation.z > 0.5){
       left.mtxLocal.rotateZ(-10);
+    }else if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.D]) && left.mtxLocal.rotation.z > -29.5){
+      left.mtxLocal.rotateZ(-10);
+      left.getComponent(ƒ.ComponentRigidbody).collisions.forEach(function(col){
+        if(col.node.name == "Ball"){
+          (<Ball>(col.node)).multihit = 0;
+          flipBall(col, left);
+        }
+      });
+    }else if(!ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.D]) && left.mtxLocal.rotation.z < -0.5){
+      left.mtxLocal.rotateZ(10);
     }
 
-    if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.D]) && right.mtxLocal.rotation.z > -29.5){
+    if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT]) && right.mtxLocal.rotation.z > -29.5){
       right.mtxLocal.rotateZ(-10);
+      right.getComponent(ƒ.ComponentRigidbody).collisions.forEach(function(col){
+        if(col.node.name == "Ball"){
+          (<Ball>(col.node)).multihit = 0;
+          flipBall(col, right);
+        }
+      });
+    }else if(!ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.ARROW_LEFT]) && right.mtxLocal.rotation.z < -0.5){
+      right.mtxLocal.rotateZ(10);
+    }else if(ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_LEFT]) && right.mtxLocal.rotation.z < 29.5){
+      right.mtxLocal.rotateZ(10);
       right.getComponent(ƒ.ComponentRigidbody).collisions.forEach(function(col){
         if(col.node.name == "Ball"){
           flipBall(col, right);
         }
       });
-    }else if(!ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.D]) && right.mtxLocal.rotation.z < -0.5){
-      right.mtxLocal.rotateZ(10);
+    }else if(!ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.ARROW_LEFT]) && right.mtxLocal.rotation.z > 0.5){
+      right.mtxLocal.rotateZ(-10);
     }
 
     ƒ.Physics.world.simulate();  // if physics is included and used

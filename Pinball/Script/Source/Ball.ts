@@ -8,13 +8,15 @@ namespace Pinball {
   export class Ball extends ƒ.Node {
     public multihit: number;
     public static val: Values;
+    private mesh = new ƒ.MeshSphere();
+    private mat = new ƒ.Material("pinball", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(0.9, 0.9, 0.9, 1)));
 
     constructor(_pos?: ƒ.Vector3) {
       super("Ball");
-      this.multihit = 1;
+      this.multihit = 0;
 
-      this.addComponent(new ƒ.ComponentMesh(new ƒ.MeshSphere));
-      this.addComponent(new ƒ.ComponentMaterial(new ƒ.Material("pinball", ƒ.ShaderFlat, new ƒ.CoatColored(new ƒ.Color(0.9, 0.9, 0.9, 1)))));
+      this.addComponent(new ƒ.ComponentMesh(this.mesh));
+      this.addComponent(new ƒ.ComponentMaterial(this.mat));
       this.addComponent(new ƒ.ComponentTransform());
 
       if(!_pos){

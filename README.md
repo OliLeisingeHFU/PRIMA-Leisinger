@@ -37,4 +37,4 @@ Left Arrow/Right Arrow: rotate right flipper counterclockwise/clockwise
 |  9 | Light             | One ambient light for base brightness, one directional light for shadows, simply attached to the graph |
 |  A | Physics           | Rigidbodies on each object. The ball's is dynamic, the rest static. launching the ball from anywhere uses forces. |
 
-Longer explanations of each Criterion can be found in the design.pdf if needed.
+Longer explanations with reference to source code of each Criterion can be found in the design.pdf if needed.

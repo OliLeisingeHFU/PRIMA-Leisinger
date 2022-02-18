@@ -38,6 +38,7 @@ namespace Script {
           this.HndAdder();
           break;
         case ƒ.EVENT.COMPONENT_REMOVE:
+          this.HndRemover();
           this.removeEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndEvent);
           this.removeEventListener(ƒ.EVENT.COMPONENT_REMOVE, this.hndEvent);
           break;
@@ -58,6 +59,19 @@ namespace Script {
           break;
       }
     }
+    private HndRemover(){
+      switch(this.objectType){
+        case "Bumper":
+          this.node.getComponent(ƒ.ComponentRigidbody).removeEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, this.colHndEvent);
+          break;
+        default:
+          this.node.getComponent(ƒ.ComponentRigidbody).removeEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.colHndEvent);
+          break;
+      }
+      
+    }
+
+    
 
     public static async loadValues(): Promise<void>{
       let response: Response = await fetch("Script/pointBalancing.json");
@@ -66,39 +80,45 @@ namespace Script {
 
     private colHndEvent(_event: ƒ.EventPhysics){
       let collider: ƒ.ComponentRigidbody = _event.cmpRigidbody;
+      let colNode: ƒ.Node = collider.node;
       let vel: ƒ.Vector3 = collider.getVelocity();
-      if(collider.node.name == "Ball"){
+      if(colNode.name == "Ball"){
+        let mult: number = (<Pinball.Ball>colNode).multihit;
         this.node.getParent().getComponent(ƒ.ComponentAudio).play(true);
         switch(this.node.getComponent(Script.CollisionHandler).objectType){
           case "Bumper":
-            
-            collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * Pinball.timesWeight(-3.5), vel.z * Pinball.timesWeight(-3.5))); //ƒ.Vector3.SCALE(collider.getVelocity(), -200)
-            Pinball.GameState.get().points += CollisionHandler.val.bumperValue;
+            collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * Pinball.timesWeight(-2), vel.z * Pinball.timesWeight(-2)));
+            Pinball.GameState.get().pointAdder(CollisionHandler.val.bumperValue, mult);
+            (<Pinball.Ball>colNode).multihit++;
             break;
           case "Coin":
-            Pinball.GameState.get().points += CollisionHandler.val.coinValue;
-            this.activate(false);
-            setTimeout(function(){this.activate(true);}, Pinball.inSeconds(CollisionHandler.val.coinTime));
+            let parent = this.node.getParent();
+            Pinball.GameState.get().pointAdder(CollisionHandler.val.coinValue, mult);
+            Pinball.deactivator(this.node, CollisionHandler.val.coinTime);
+            (<Pinball.Ball>colNode).multihit++;
+            if(!parent.getChildren()[0]){
+              Pinball.GameState.get().pointAdder(CollisionHandler.val.coinValue * 10, mult);
+              Pinball.GameState.get().notificator("COINS!" + CollisionHandler.val.coinValue * 10 + " Bonus points!");
+            }
             break;
           case "Multiball":
-            this.node.activate(false);
-            this.activate(false);
-            setTimeout(function(){
-              console.log(this.node);
-              this.node.activate(true);
-              this.activate(true);
-            }, 10000);
-
-            for(let i = 1; i < 3; i++){
-              setTimeout(function(){
-                let pos = collider.node.mtxLocal.translation;
-                setTimeout(function(){
-                  let ball = new Pinball.Ball(pos);
-                  collider.node.getParent().appendChild(ball);
-                  ball.getComponent(ƒ.ComponentRigidbody).addVelocity(new ƒ.Vector3(vel.x, (vel.y * (Math.random() * 20 - 10)), (vel.z * (Math.random() * 20 - 10))));
-                }, (i * 750));
-              }, (i * 750));
+            for(let i = 0; i < 2; i++){
+                let pos = new ƒ.Vector3((i - 1) * 5, 40, 0);
+                let ball = new Pinball.Ball(pos);
+                colNode.getParent().addChild(ball);
+                ball.getComponent(ƒ.ComponentRigidbody).addVelocity(new ƒ.Vector3(vel.x, (vel.y * (Math.random() * 20 - 10)), (vel.z * (Math.random() * 20 - 10))));
             }
+            Pinball.deactivator(this.node, 30);
+            Pinball.GameState.get().notificator("Extra Balls!");
+            break;
+          case "ForceUp":
+            Pinball.GameState.get().baseForce = 1.25;
+            Pinball.GameState.get().notificator("Force up!");
+            setTimeout(function(){
+              Pinball.GameState.get().baseForce = 1;
+              Pinball.GameState.get().notificator("Force normal");
+            }, 10000);
+            Pinball.deactivator(this.node, 30);
             break;
           default:
             break;
