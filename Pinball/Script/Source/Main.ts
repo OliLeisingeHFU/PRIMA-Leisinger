@@ -110,7 +110,7 @@ namespace Pinball {
   }
 
   export function timesWeight(_val: number): number{
-    return _val *  Ball.val.weight * GameState.get().baseForce;
+    return _val * Ball.val.weight * GameState.get().baseForce * (Ball.val.effectGravity/2);
   }
 
   export function inSeconds(_val: number): number{
@@ -118,12 +118,11 @@ namespace Pinball {
   }
 
   function flipBall(_col: ƒ.ComponentRigidbody, _flipper: ƒ.Node): void{
-    let colV = 5;
     let leftY = _flipper.mtxWorld.getY();
     let x = leftY.x;
     let y = leftY.y;
     let z = leftY.z;
-    _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), timesWeight(colV * 5))); //ƒ.Vector3.SCALE(left.mtxWorld.getY(), 75)
+    _col.applyLinearImpulse(ƒ.Vector3.SCALE(new ƒ.Vector3(x, y, z), timesWeight(5)));
   }
 
   export function deactivator(_node: ƒ.Node, time: number){
@@ -142,7 +141,7 @@ namespace Pinball {
             parent.addChild(new Power(node.name));
         }
       }, Pinball.inSeconds(time));
-    }, 250);
+    }, 100);
   }
 
   function update(_event: Event): void {

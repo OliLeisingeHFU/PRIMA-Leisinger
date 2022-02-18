@@ -87,7 +87,6 @@ namespace Script {
         this.node.getParent().getComponent(ƒ.ComponentAudio).play(true);
         switch(this.node.getComponent(Script.CollisionHandler).objectType){
           case "Bumper":
-            collider.applyLinearImpulse(new ƒ.Vector3(vel.x, vel.y * Pinball.timesWeight(-2), vel.z * Pinball.timesWeight(-2)));
             Pinball.GameState.get().pointAdder(CollisionHandler.val.bumperValue, mult);
             (<Pinball.Ball>colNode).multihit++;
             break;
@@ -106,7 +105,7 @@ namespace Script {
                 let pos = new ƒ.Vector3((i - 1) * 5, 40, 0);
                 let ball = new Pinball.Ball(pos);
                 colNode.getParent().addChild(ball);
-                ball.getComponent(ƒ.ComponentRigidbody).addVelocity(new ƒ.Vector3(vel.x, (vel.y * (Math.random() * 20 - 10)), (vel.z * (Math.random() * 20 - 10))));
+                ball.getComponent(ƒ.ComponentRigidbody).addVelocity(new ƒ.Vector3(vel.x, (vel.y * (Math.random() * 2 - 1)), (vel.z * (Math.random() * 2 - 1))));
             }
             Pinball.deactivator(this.node, 30);
             Pinball.GameState.get().notificator("Extra Balls!");

@@ -3,6 +3,8 @@ namespace Pinball {
 
   interface Values {
     weight: number;
+    restitution: number;
+    effectGravity: number;
   }
 
   export class Ball extends ƒ.Node {
@@ -28,6 +30,8 @@ namespace Pinball {
         this.mtxLocal.translateZ(_pos.z);
       }
       addColliders([this], Ball.val.weight, ƒ.BODY_TYPE.DYNAMIC, ƒ.COLLIDER_TYPE.SPHERE);
+      this.getComponent(ƒ.ComponentRigidbody).restitution = Ball.val.restitution;
+      this.getComponent(ƒ.ComponentRigidbody).effectGravity = Ball.val.effectGravity;
     }
 
     public static async loadValues(): Promise<void>{

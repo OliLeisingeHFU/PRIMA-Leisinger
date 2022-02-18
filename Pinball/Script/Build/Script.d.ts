@@ -2,6 +2,8 @@ declare namespace Pinball {
     import ƒ = FudgeCore;
     interface Values {
         weight: number;
+        restitution: number;
+        effectGravity: number;
     }
     export class Ball extends ƒ.Node {
         multihit: number;

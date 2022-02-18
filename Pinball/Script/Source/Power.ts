@@ -12,7 +12,7 @@ namespace Pinball {
       this.addComponent(new ƒ.ComponentMesh(this.mesh));
       
       this.addComponent(new ƒ.ComponentTransform());
-      this.getComponent(ƒ.ComponentMesh).mtxPivot.scale(new ƒ.Vector3(0.75,0.75,0.75));
+      this.getComponent(ƒ.ComponentMesh).mtxPivot.scale(new ƒ.Vector3(1.5,1.5,1.5));
       addColliders([this], 1, ƒ.BODY_TYPE.STATIC, ƒ.COLLIDER_TYPE.CUBE, true);
 
       switch(this.name){
